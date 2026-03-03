@@ -6,7 +6,7 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/02 17:51:30 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/03 10:51:28 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/03 11:11:25 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,9 +60,11 @@ int main(int ac, char **av)
 				input.push_back(atoi(av[i]));
 		}
 	}
+
 	PmergeMe	object(input);
 	object.printVector(input);
-	
+	object.process();
+
 	return 0;
 }
 
