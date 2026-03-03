@@ -6,13 +6,17 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/02 17:51:30 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/02 18:52:34 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/03 10:51:28 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <cstdlib>
+#include "PmergeMe.hpp"
+
+static int	strdigit(const char* str);
 
 int main(int ac, char **av)
 {
@@ -45,19 +49,19 @@ int main(int ac, char **av)
 	}
 	else
 	{
-		for (int i = 0; av[i]; i++)
+		for (int i = 1; av[i]; i++)
 		{
-			if (strdigit(av[i]))
-				input.push_back(atoi(av[i]));
-			else
+			if (!strdigit(av[i]))
 			{
 				std::cerr << "Error: Wrong input" << std::endl;
 				return 1;
 			}
+			else
+				input.push_back(atoi(av[i]));
 		}
 	}
-
-	PmergeMe();
+	PmergeMe	object(input);
+	object.printVector(input);
 	
 	return 0;
 }
@@ -66,7 +70,7 @@ int	strdigit(const char* str)
 {
 	for (int i = 0; str[i]; i++)
 	{
-		if (std::isdigit(str[i]))
+		if (!std::isdigit(str[i]))
 			if (!(i == 0 && str[i] == '+' && std::isdigit(str[i + 1])))
 				return 0;
 	}
