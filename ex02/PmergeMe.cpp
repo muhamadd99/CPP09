@@ -6,7 +6,7 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/02 18:51:45 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/03 13:41:11 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/03 18:39:48 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,30 +43,24 @@ void PmergeMe::printVector(const std::vector<int>& vec)
 
 void PmergeMe::process()
 {
-	// std::vector<std::pair<int, int> >	pairs;
-
-	// for (int i = 0; i < _nbr.size(); i += 2)
-	// {
-	// 	if (i + 1 >= _nbr.size())
-	// 	{
-	// 		//odd number handling
-	// 		continue ; //to skip even number handling
-	// 	}
-	// 	int	a;
-	// 	int	b;
-	// 	if (_nbr[i] > _nbr[i + 1])
-	// 	{
-	// 		a = _nbr[i];
-	// 		b = _nbr[i + 1];
-	// 	}
-	// 	else
-	// 	{
-	// 		a = _nbr[i + 1];
-	// 		b = _nbr[i];
-	// 	}
-	// 	pairs.push_back(std::make_pair(a, b));
-	// }
+	makeJacobSeq();
 	recurse(_nbr);
+}
+
+//the limit is 10923
+void PmergeMe::makeJacobSeq()
+{
+	_jacobSeq.clear();
+	_jacobSeq.push_back(3);
+	_jacobSeq.push_back(5);
+	
+	int nbr = 0;
+	while (_jacobSeq.back() < 10923)
+	{
+		nbr = _jacobSeq.back() + (2 * _jacobSeq[_jacobSeq.size() - 2]);
+		_jacobSeq.push_back(nbr);
+	}
+	return ;
 }
 
 void PmergeMe::recurse(std::vector<int> tmp)
@@ -122,9 +116,7 @@ void PmergeMe::recurse(std::vector<int> tmp)
 
 	//push pending to main
 	//1st
-	main.push_back(pending[0]);
-	//3rd,5th,11th. so we must check pending.size() is divisible by jacobsthal or not. am i correct?
-	//lets say nbr is 9. our jacobsthal will find 5 produces 0. so how do we solve the remaining?
-	//the remaining is size() > 5. so i have to push element size()(8th). then element size() - 1(7th). then element size() - 2(6th) until it reaches the jacobsthall.
-	//then repeat according to next jacobsthal until next jacobsthal. is it like that?
+	main.insert(main.begin(), pending[0]);
+	
+	
 }

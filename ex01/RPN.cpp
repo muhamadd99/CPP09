@@ -6,7 +6,7 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/01 18:15:12 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/02 12:54:43 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/03 18:18:07 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,9 @@ void	RPN::runInput()
 		}
 	}
 	if (_nbr.size() != 1)
-		return(std::cerr << "Error: unfinished number" << std::endl); 
-	std::cout << _nbr.top() << std::endl;
+		std::cerr << "Error: unfinished number" << std::endl; 
+	else
+		std::cout << _nbr.top() << std::endl;
 }
 
 int RPN::handleOperator(int i)
