@@ -6,13 +6,14 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/02 18:51:45 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/03 18:39:48 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/04 17:42:04 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "PmergeMe.hpp"
 #include <iostream>
 #include <utility> //pair
+#include <algorithm>
 
 PmergeMe::PmergeMe(std::vector<int>& nbr) :_nbr(nbr)
 {}
@@ -85,10 +86,10 @@ void PmergeMe::recurse(std::vector<int> tmp)
 			int	b;
 			if (tmp[i] > tmp[i + 1])
 			{
-				a = _nbr[i];
-				b = _nbr[i + 1];
+				a = tmp[i];
+				b = tmp[i + 1];
 			}
-			else
+			else //so equal would take 2nd and put in main, then 1st in pending
 			{
 				a = tmp[i + 1];
 				b = tmp[i];
@@ -117,6 +118,24 @@ void PmergeMe::recurse(std::vector<int> tmp)
 	//push pending to main
 	//1st
 	main.insert(main.begin(), pending[0]);
-	
-	
+
+	int	lastInsertedIndex = 1;
+	for (int i = 0; i < _jacobSeq.size(); i++)
+	{
+		int currJacobNbr = _jacobSeq[i];
+		
+		int currLimit = std::min<int>(currJacobNbr, pending.size());
+		for (int j = currLimit; j > lastInsertedIndex; j--)
+		{
+			int value = pending[j - 1];
+
+			auto insertLoc = std::lower_bound(main.begin(), main.end(), value);
+			main.insert(insertLoc, value);
+		}
+		lastInsertedIndex = currLimit;
+		
+		if (lastInsertedIndex == currLimit)
+			break ;
+	}
 }
+
