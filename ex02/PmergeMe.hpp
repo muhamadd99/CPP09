@@ -6,7 +6,7 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/02 18:51:50 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/09 12:58:52 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/09 18:11:43 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ struct ComparatorV
 {
 	size_t &count;
 
-	ComparatorV(size_t& c) : count(c) {}
+	ComparatorV(size_t& compareVec) : count(compareVec) {}
 	
 	bool operator()(const ChainV& other, int targetValue) const
 	{
@@ -48,7 +48,7 @@ struct ComparatorD
 {
 	size_t &count;
 
-	ComparatorD(size_t& c) : count(c) {}
+	ComparatorD(size_t& compareDeq) : count(compareDeq) {}
 	
 	bool operator()(const ChainD& other, int targetValue) const
 	{

@@ -6,7 +6,7 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/02 18:51:45 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/09 12:59:19 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/09 18:12:57 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,13 +53,13 @@ void PmergeMe::runPrint(int ac, char **av)
 
 	std::cout << "After: "; printVector(_sortedVec);
 	
-	std::cout << "Vector No of comparisons: " << _compareVec << std::endl;
+	// std::cout << "Vector No of comparisons: " << _compareVec << std::endl;
 
-	std::cout << "Before: "; printDeque(_nbrDeq);
+	// std::cout << "Before: "; printDeque(_nbrDeq);
 
-	std::cout << "After: "; printDeque(_sortedDeq);
+	// std::cout << "After: "; printDeque(_sortedDeq);
 	
-	std::cout << "Deque No of comparisons: " << _compareDeq << std::endl;
+	// std::cout << "Deque No of comparisons: " << _compareDeq << std::endl;
 	
 	std::cout << "Time to process a range of " << _nbrVec.size() << " elements with std::vector : " << _durationVec << " us" << std::endl;
 	
@@ -110,7 +110,6 @@ int PmergeMe::parseVector(int ac,  char **av)
 void PmergeMe::processVec()
 {
 	struct timeval start, end;
-	
 	gettimeofday(&start, NULL);
 	
 	makeJacobVec();
@@ -253,6 +252,7 @@ void	PmergeMe::insertJacob(chainVec& main, chainVec& pending)
 			break ;
 	}
 }
+//std::cout << "count: " << comp.count << ". targetwinner value: "<< target.winner << std::endl;
 
 void PmergeMe::updatePos(chainVec& pending, size_t insertIdx)
 {
