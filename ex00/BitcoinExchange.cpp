@@ -6,7 +6,7 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/27 17:20:38 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/01 15:49:25 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/08 22:50:14 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,24 +67,24 @@ int	BitcoinExchange::parseRate()
 	return 0;
 }
 
-int	BitcoinExchange::checkInput()
+int	BitcoinExchange::processInput()
 {
-	std::ifstream	valueFile(_filePath.c_str());
+	std::ifstream	quantityFile(_filePath.c_str());
 	
-	if (!valueFile.is_open())
+	if (!quantityFile.is_open())
 	{
 		std::cerr << "Couldn't open " << _filePath << std::endl;
 		return 1;
 	}
 	std::string line;
-	std::getline(valueFile, line);
+	std::getline(quantityFile, line);
 	if (line != "date | value")
 	{
 		std::cerr << "Wrong first line" << std::endl;
 		return 1;
 	}
 	std::cout << line << std::endl;
-	while (std::getline(valueFile, line))
+	while (std::getline(quantityFile, line))
 	{
 		//			CHECK INPUT
 		if (line.empty())
@@ -97,15 +97,15 @@ int	BitcoinExchange::checkInput()
 			continue ;
 		}
 		std::string date = line.substr(0, pos);
-		std::string value = line.substr(pos + 1);
+		std::string quantity = line.substr(pos + 1);
 		if (checkDate(date))
 		{
 			std::cout << "wrong date" << std::endl;
 			continue ;
 		}
-		if (checkValue(value))
+		if (checkValue(quantity))
 		{
-			std::cout << "wrong value" << std::endl;
+			std::cout << "wrong quantity" << std::endl;
 			continue ;	
 		}
 		getResult();
@@ -117,25 +117,20 @@ int	BitcoinExchange::checkDate(std::string date)
 {
 	if (date.length() != 11)
 		return 1;
-	// std::cout << "exited here 1a" << std::endl; //debug	
 	if (date[4] != '-' || date[7] != '-' || date[10] != ' ')
 		return 1;
-	// std::cout << "exited here 1b" << std::endl; //debug	
 	std::string year	= date.substr(0, 4);
 	std::string month	= date.substr(5, 2);
 	std::string day		= date.substr(8, 2);
 	//				IS ALL DIGIT?
-	// std::cout << "exited here 1c" << std::endl; //debug		
 	if (strdigit(year) || strdigit(month) || strdigit(day))
 		return 1;
-	// std::cout << "exited here 1" << std::endl; //debug
 	int	yearI = atoi(year.c_str());
 	int monthI = atoi(month.c_str());
 	int	dayI = atoi(day.c_str());
 	//				IS THE DIGIT VALID?
-	if (yearI < 2009 || monthI < 1 || monthI > 12 || dayI < 1)
+	if (/*yearI < 2009 ||*/ monthI < 1 || monthI > 12 || dayI < 1)
 		return 1;
-	// std::cout << "exited here 2" << std::endl; //debug
 	int daysInMonth[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 	//				IS IT LEAP YEAR?
 	if (monthI == 2)
@@ -159,7 +154,6 @@ int	BitcoinExchange::checkValue(std::string valueStr)
 	float valueF = std::atof(value.c_str());
 	if (valueF < 0 || valueF > 1000)
 		return 1;
-	//std::cout << "valueF check: " << valueF << std::endl; //debug
 	_value = valueF;
 	return 0;
 }
@@ -198,8 +192,14 @@ int	BitcoinExchange::strdigit2(std::string str)
 {
 	if (str.empty())
 		return 1;
-	int	noOfDot = 0;
-	for (size_t i = 0; i < str.length(); i++)
+	size_t	i = 0;
+	if (str[i] == '+')
+		i++;
+	if (i == str.size())
+		return 1;
+	int		noOfDot = 0;
+	bool	hasDigit = false;
+	for (; i < str.length(); i++)
 	{
 		if (str[i] == '.')
 		{
@@ -207,8 +207,10 @@ int	BitcoinExchange::strdigit2(std::string str)
 			if (noOfDot > 1)
 				return 1;
 		}
-		else if (!std::isdigit(str[i]))
-				return 1;
+		else if (std::isdigit(str[i]))
+			hasDigit = true;
+		else /*if (!std::isdigit(str[i]))*/
+			return 1;
 	}
-	return 0;
+	return (!hasDigit);
 }

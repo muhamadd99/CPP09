@@ -6,7 +6,7 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/02 18:51:50 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/07 13:59:51 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/09 12:56:24 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,39 +17,75 @@
 #include <deque>
 #include <string>
 
-struct Chain
+struct ChainV
 {
 	int					winner;
-	std::vector<Chain>	losers;
+	std::vector<ChainV>	losers;
 	size_t				pos;
-	bool operator<(const Chain& other) const
-	{
-		return winner < other.winner;
-	}
 };
 
-struct Comparator
+	// bool operator<(const ChainV& other) const //do I really need this?
+	// {
+	// 	return winner < other.winner;
+	// }
+
+struct ComparatorV
 {
 	size_t &count;
 
-	Comparator(size_t& c) : count(c) {}
+	ComparatorV(size_t& c) : count(c) {}
 	
-	bool operator()(const Chain& other, int value) const
+	bool operator()(const ChainV& other, int targetValue) const
 	{
 		count++;
-		return other.winner < value;
+		return other.winner < targetValue;
 	}
 };
+
+struct ChainD
+{
+	int					winner;
+	std::deque<ChainD>	losers;
+	size_t				pos;
+};
+
+	// bool operator<(const ChainV& other) const //do I really need this?
+	// {
+	// 	return winner < other.winner;
+	// }
+
+struct ComparatorD
+{
+	size_t &count;
+
+	ComparatorD(size_t& c) : count(c) {}
+	
+	bool operator()(const ChainD& other, int targetValue) const
+	{
+		count++;
+		return other.winner < targetValue;
+	}
+};
+
+typedef std::vector<ChainV> chainVec;
+typedef std::deque<ChainD>  chainDeq;
 
 class PmergeMe {
 private:
 //			VECTOR
-	std::vector<int> _nbr;
-	std::vector<int> _jacobSeq;
-	std::vector<int> _sortedVec;
+	std::vector<int>	_nbrVec;
+	std::vector<int>	_jacobVec;
+	std::vector<int>	_sortedVec;
+	size_t				_compareVec;
+	double				_durationVec;
+
 //			DEQUE
-	std::deque<int> _nbrDeque;
-	size_t	_comparison;
+	std::deque<int>		_nbrDeq;
+	std::deque<int>		_jacobDeq;
+	std::deque<int>		_sortedDeq;
+	size_t				_compareDeq;
+	double				_durationDeq;
+
 public:
 	PmergeMe();
 	PmergeMe(const PmergeMe& other);
@@ -57,19 +93,33 @@ public:
 	~PmergeMe();
 
 	int		strdigit(const char* str);
-	//				VECTOR
-	std::vector<Chain>	recurse(std::vector<Chain> tmp);
-	//std::vector<int>	recurse(std::vector<int> tmp);
-	void	runVector(int ac, char **av);
-	void	processVec();
-	void	makeJacobSeq();
+	void	runPrint(int ac, char **av);
 	void	printErr(std::string str);
-	void	printVector(const std::vector<int>& vec);
-	static bool	chainCompare(const Chain& other, int value);
+
+	//				VECTOR
+	//std::vector<int>	recurse(std::vector<int> tmp);
+	int			parseVector(int ac, char **av);
+	void		processVec();
+	void		makeJacobVec();
+	chainVec	recurse(chainVec tmp);
+	chainVec	createNewLvl(chainVec& tmp, bool& hasOdd, ChainV& oddChain);
+	void		preJacob(chainVec& newLvl, chainVec& main, chainVec& pending, bool hasOdd, ChainV& oddChain);
+	void		insertJacob(chainVec& main, chainVec& pending);
+	void		updatePos(chainVec& pending, size_t insertIdx);
+	void		printVector(const std::vector<int>& vec);
+
 	//				DEQUE
-	void	runDeque(int ac,  char **av);
-	void	printDeque(const std::deque<int>& deq);
-	void	processDeque(); //not finished yet
+	int			parseDeque(int ac,  char **av);
+	void		processDeq();
+	void		makeJacobDeq();
+	chainDeq	recurse(chainDeq tmp);
+	chainDeq	createNewLvl(chainDeq& tmp, bool& hasOdd, ChainD& oddChain);
+	void		preJacob(chainDeq& newLvl, chainDeq& main, chainDeq& pending, bool hasOdd, ChainD& oddChain);
+	void		insertJacob(chainDeq& main, chainDeq& pending);
+	void		updatePos(chainDeq& pending, size_t insertIdx);
+	void		printDeque(const std::deque<int>& deq);
+	
+	//static bool	chainCompare(const Chain& other, int value);
 };
 
 #endif

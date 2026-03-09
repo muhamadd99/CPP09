@@ -6,7 +6,7 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/27 15:32:00 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/02/28 23:05:56 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/08 22:50:03 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,5 +24,5 @@ int main(int ac, char **av)
 	std::string file = av[1];
 	BitcoinExchange	exchange(file);
 	exchange.parseRate();
-	exchange.checkInput();
+	exchange.processInput();
 }

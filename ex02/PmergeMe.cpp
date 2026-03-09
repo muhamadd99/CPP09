@@ -6,29 +6,34 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/02 18:51:45 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/07 13:59:27 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/09 12:56:52 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "PmergeMe.hpp"
+#include <cstddef>
 #include <iostream>
 #include <iterator>
-#include <utility> //pair
+#include <sys/time.h>
 #include <algorithm>
 #include <sstream>
 
-PmergeMe::PmergeMe() : _comparison(0)
+PmergeMe::PmergeMe() : _compareVec(0), _compareDeq(0)
 {}
 
-PmergeMe::PmergeMe(const PmergeMe& other) : _nbr(other._nbr), _comparison(0)
+PmergeMe::PmergeMe(const PmergeMe& other) : _nbrVec(other._nbrVec), _compareVec(0),
+			_durationVec(0),  _compareDeq(0), _durationDeq(0)
 {}
 
 PmergeMe& PmergeMe::operator=(const PmergeMe& other) 
 {
 	if (this != &other)
 	{
-		_nbr = other._nbr;
-		_comparison = other._comparison;
+		_nbrVec = other._nbrVec;
+		_compareVec = other._compareVec;
+		_compareDeq = other._compareDeq;
+		_durationVec = other._durationVec;
+		_durationDeq = other._durationDeq;
 	}
 	return *this;
 }
@@ -36,82 +41,109 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& other)
 PmergeMe::~PmergeMe()
 {}
 
-void PmergeMe::runVector(int ac,  char **av)
+void PmergeMe::runPrint(int ac, char **av)
+{
+	if (parseVector(ac, av)) return ;
+	processVec();
+	
+	parseDeque(ac, av);
+	processDeq();
+	
+	std::cout << "Before: "; printVector(_nbrVec);
+
+	std::cout << "After: "; printVector(_sortedVec);
+	
+	std::cout << "Vector No of comparisons: " << _compareVec << std::endl;
+
+	std::cout << "Before: "; printDeque(_nbrDeq);
+
+	std::cout << "After: "; printDeque(_sortedDeq);
+	
+	std::cout << "Deque No of comparisons: " << _compareDeq << std::endl;
+	
+	std::cout << "Time to process a range of " << _nbrVec.size() << " elements with std::vector : " << _durationVec << " us" << std::endl;
+	
+	std::cout << "Time to process a range of " << _nbrDeq.size() << " elements with std::deque : " << _durationDeq << " us" << std::endl;
+
+}
+
+int PmergeMe::parseVector(int ac,  char **av)
 {
 	if (ac == 1)
-		return printErr("No Input");
+	{
+		printErr("No Input");
+		return 1;
+	}
 	else if (ac == 2)
 	{
-		std::stringstream ss(av[1]); //can i give char* str directly?
+		std::stringstream ss(av[1]);
 		std::string tmp;
 
 		while (ss >> tmp)
 		{
 			if (!strdigit(tmp.c_str()))
-				return printErr("Wrong Input");
-			_nbr.push_back(atoi(tmp.c_str()));
+			{
+				printErr("Wrong Input");
+				return 1;
+			}
+			_nbrVec.push_back(atoi(tmp.c_str()));
 		}
-		if (_nbr.size() == 1)
-			std::cout << _nbr[0] << std::endl;
+		if (_nbrVec.size() == 1)
+			std::cout << _nbrVec[0] << std::endl;
 	}
 	else
 	{
 		for (int i = 1; av[i]; i++)
 		{
 			if (!strdigit(av[i]))
-				return printErr("Wrong Input");
+			{
+				printErr("Wrong Input");
+				return 1; 
+			}
 			else
-				_nbr.push_back(atoi(av[i]));
+				_nbrVec.push_back(atoi(av[i]));
 		}
 	}
-}
-
-void PmergeMe::printVector(const std::vector<int>& vec)
-{
-	for (size_t i = 0; i < vec.size(); ++i)
-	{
-		std::cout << vec[i];
-		if (i < vec.size() - 1)
-            std::cout << " ";
-    }
-    std::cout << std::endl;
+	return 0;
 }
 
 void PmergeMe::processVec()
 {
-	makeJacobSeq();
-	std::vector<Chain> number;
-	std::vector<Chain> sorted;
-	for (size_t i = 0; i < _nbr.size(); i++)
+	struct timeval start, end;
+	
+	gettimeofday(&start, NULL);
+	
+	makeJacobVec();
+	chainVec number;
+	chainVec sorted;
+	for (size_t i = 0; i < _nbrVec.size(); i++)
 	{
-		Chain c;
-		c.winner = _nbr[i];
+		ChainV c;
+		c.winner = _nbrVec[i];
 		number.push_back(c);
 	}
 	sorted = recurse(number);
 	for (size_t i = 0; i < sorted.size(); i++)
 		_sortedVec.push_back(sorted[i].winner);
-	std::cout << "Before: ";
-	printVector(_nbr);
-	std::cout << std::endl;
-	std::cout << "After: ";
-	printVector(_sortedVec);
-	std::cout << std::endl;
-	std::cout << "No of comparisons: " << _comparison << std::endl;
+	
+	gettimeofday(&end, NULL);
+	long startUsec	= (start.tv_sec * 1000000) + start.tv_usec;
+	long endUsec	= (end.tv_sec * 1000000) + end.tv_usec;
+	_durationVec	= endUsec - startUsec;
 }
 
 //the limit is 10923
-void PmergeMe::makeJacobSeq()
+void PmergeMe::makeJacobVec()
 {
-	_jacobSeq.clear();
-	_jacobSeq.push_back(3);
-	_jacobSeq.push_back(5);
+	_jacobVec.clear();
+	_jacobVec.push_back(3);
+	_jacobVec.push_back(5);
 	
 	int nbr = 0;
-	while (_jacobSeq.back() < 10923)
+	while (_jacobVec.back() < 10923)
 	{
-		nbr = _jacobSeq.back() + (2 * _jacobSeq[_jacobSeq.size() - 2]);
-		_jacobSeq.push_back(nbr);
+		nbr = _jacobVec.back() + (2 * _jacobVec[_jacobVec.size() - 2]);
+		_jacobVec.push_back(nbr);
 	}
 	return ;
 }
@@ -127,112 +159,132 @@ int	PmergeMe::strdigit(const char* str)
 	return 1;
 }
 
-void	PmergeMe::printErr(std::string str)
+chainVec	PmergeMe::recurse(chainVec tmp)
 {
-	std::cerr << "Error: " << str << std::endl;
-}
-
-
-std::vector<Chain>	PmergeMe::recurse(std::vector<Chain> tmp)
-{
-	//			SEPARATE PENDING AND MAIN
 	if (tmp.size() <= 1)
 		return tmp;
 
-	std::vector<Chain>	newLvl;
-	bool				hasOdd = (tmp.size() % 2 != 0);
-	Chain				oddChain;
+	bool		hasOdd = (tmp.size() % 2 != 0);
+	ChainV		oddChain;
+	chainVec	newLvl = createNewLvl(tmp, hasOdd, oddChain);
+
+	newLvl = recurse(newLvl);
+
+	chainVec	main;
+	chainVec	pending;
+	
+	preJacob(newLvl, main, pending, hasOdd, oddChain);
+	insertJacob(main, pending);
+	
+	return main;
+}
+
+chainVec	PmergeMe::createNewLvl(chainVec& tmp, bool& hasOdd, ChainV& oddChain)
+{
+	chainVec	newLvl;
 
 	if (hasOdd)
 	{
 		oddChain = tmp.back();
 		tmp.pop_back();
 	}
-
 	for (size_t i = 0; i < tmp.size(); i += 2)
 	{
-		_comparison++;
+		_compareVec++;
 		if (tmp[i].winner > tmp[i + 1].winner)
 		{
 			tmp[i].losers.push_back(tmp[i + 1]);
 			newLvl.push_back(tmp[i]);
 		}
-		else
+		else 
 		{
 			tmp[i + 1].losers.push_back(tmp[i]);
 			newLvl.push_back(tmp[i + 1]);
 		}
 	}
-	//			RECURSION
-	newLvl = recurse(newLvl);
+	return newLvl;
+}
 
-	//			PRE JACOBSTHAL
-	std::vector<Chain>	main;
-	std::vector<Chain>	pending;
-
+void	PmergeMe::preJacob(chainVec& newLvl, chainVec& main, chainVec& pending, bool hasOdd, ChainV& oddChain)
+{
 	for (size_t i = 0; i < newLvl.size(); i++)
 	{
 		pending.push_back(newLvl[i].losers.back());
-		pending[i].pos = i; //added
+		pending[i].pos = i;
 		newLvl[i].losers.pop_back();
 		main.push_back(newLvl[i]);
 	}
-
 	if (hasOdd)
 	{
 		oddChain.pos = main.size();
 		pending.push_back(oddChain);
 	}
+}
 
+void	PmergeMe::insertJacob(chainVec& main, chainVec& pending)
+{
 	if (!pending.empty())
 	{
 		main.insert(main.begin(), pending[0]);
-		for (size_t k = 0; k < pending.size(); k++)
-			pending[k].pos++;
+		updatePos(pending, 0);
 	}
 
-	//			JACOBSTHAL
 	size_t		lastInsertedPos = 1;
-	Comparator	comp(_comparison);
+	ComparatorV	comp(_compareVec);
 
-	for (size_t i = 0; i < _jacobSeq.size(); i++)
+	for (size_t i = 0; i < _jacobVec.size(); i++)
 	{
-		size_t	jacobNo = _jacobSeq[i];
+		size_t	jacobNo = _jacobVec[i];
 		size_t	currLimit = std::min<size_t>(jacobNo, pending.size());
-
+		
 		for (size_t j = currLimit; j > lastInsertedPos; j--)
 		{
-			Chain							val = pending[j - 1];
-			std::vector<Chain>::iterator	insertLoc;
+			ChainV				target	  = pending[j - 1];
+			chainVec::iterator	limit	  = main.begin() + pending[j - 1].pos;
+			chainVec::iterator	insertLoc = std::lower_bound(main.begin(), limit, target.winner, comp);
 
-			// insertLoc = std::lower_bound(main.begin(), main.end(), val.winner, comp);
-			std::vector<Chain>::iterator limit = main.begin() + pending[j - 1].pos; //added
-			insertLoc = std::lower_bound(main.begin(), limit, val.winner, comp);
-			size_t insertIdx = std::distance( main.begin(), insertLoc);//added
-			main.insert(insertLoc, val);
-			for(size_t k = 0; k < pending.size(); k++) //added
-				if (pending[k].pos >= insertIdx) //added
-					pending[k].pos++; //added
+			size_t	insertIdx = std::distance(main.begin(), insertLoc);
+			main.insert(insertLoc, target);
+			updatePos(pending, insertIdx);
 		}
 		lastInsertedPos = currLimit;
 
 		if (lastInsertedPos == pending.size())
-			break;
+			break ;
 	}
-
-	return main;
 }
 
-bool	PmergeMe::chainCompare(const Chain& other, int value)
+// for (size_t k = 0; k < pending.size(); k++)
+// 	pending[k].pos++;
+// for (size_t k = 0; k < pending.size(); k++)
+// 	if (pending[k].pos >= insertIdx)
+// 		pending[k].pos++;
+
+void PmergeMe::updatePos(chainVec& pending, size_t insertIdx)
 {
-	return other.winner < value;
+	for (size_t k = 0; k < pending.size(); k++)
+		if (pending[k].pos >= insertIdx)
+			pending[k].pos++;
 }
 
-//not tested
-void PmergeMe::runDeque(int ac, char **av)
+void PmergeMe::printVector(const std::vector<int>& vec)
+{
+	for (size_t i = 0; i < vec.size(); ++i)
+	{
+		std::cout << vec[i];
+		if (i < vec.size() - 1)
+            std::cout << " ";
+    }
+    std::cout << std::endl;
+}
+
+int PmergeMe::parseDeque(int ac, char **av)
 {
 	if (ac == 1)
-		return printErr("No Input");
+	{
+		printErr("No Input");
+		return 1;
+	}
 	else if (ac == 2)
 	{
 		std::stringstream ss(av[1]); //can i give char* str directly?
@@ -241,27 +293,181 @@ void PmergeMe::runDeque(int ac, char **av)
 		while (ss >> tmp)
 		{
 			if (!strdigit(tmp.c_str()))
-				return printErr("Wrong Input");
-			_nbrDeque.push_back(atoi(tmp.c_str()));
+			{
+				printErr("Wrong Input");
+				return 1;
+			}
+			_nbrDeq.push_back(atoi(tmp.c_str()));
 		}
-		if (_nbr.size() == 1)
-			std::cout << _nbr[0] << std::endl;
+		if (_nbrDeq.size() == 1)
+			std::cout << _nbrDeq[0] << std::endl;
 	}
 	else
 	{
 		for (int i = 1; av[i]; i++)
 		{
 			if (!strdigit(av[i]))
-				return printErr("Wrong Input");
+			{
+				printErr("Wrong Input");
+				return 1;
+			}
 			else
-				_nbrDeque.push_back(atoi(av[i]));
+				_nbrDeq.push_back(atoi(av[i]));
 		}
-	}	
+	}
+	return 0;
+}
+
+// not finished yet
+void PmergeMe::processDeq()
+{
+	struct timeval start, end;
+	
+	gettimeofday(&start, NULL);
+	
+	makeJacobDeq();
+	chainDeq number;
+	chainDeq sorted;
+	for (size_t i = 0; i < _nbrDeq.size(); i++)
+	{
+		ChainD c;
+		c.winner = _nbrDeq[i];
+		number.push_back(c);
+	}
+	sorted = recurse(number);
+	for (size_t i = 0; i < sorted.size(); i++)
+		_sortedDeq.push_back(sorted[i].winner);
+	
+	gettimeofday(&end, NULL);
+	long startUsec	= (start.tv_sec * 1000000) + start.tv_usec;
+	long endUsec	= (end.tv_sec * 1000000) + end.tv_usec;
+	_durationDeq	= endUsec - startUsec;
+}
+
+//the limit is 10923
+//Formula: n + (2 * (n-1))
+void PmergeMe::makeJacobDeq()
+{
+	_jacobDeq.clear();
+	_jacobDeq.push_back(3);
+	_jacobDeq.push_back(5);
+	
+	int nbr = 0;
+	while (_jacobDeq.back() < 10923)
+	{
+		nbr = _jacobDeq.back() + (2 * _jacobDeq[_jacobDeq.size() - 2]);
+		_jacobDeq.push_back(nbr);
+	}
+	return ;
+}
+
+chainDeq	PmergeMe::recurse(chainDeq tmp)
+{
+	if (tmp.size() <= 1)
+		return tmp;
+	
+	bool		hasOdd = (tmp.size() % 2 != 0);
+	ChainD		oddChain;
+	chainDeq	newLvl = createNewLvl(tmp, hasOdd, oddChain);
+
+	newLvl =  recurse(newLvl);
+
+	chainDeq	main;
+	chainDeq	pending;
+
+	preJacob(newLvl,  main,  pending,  hasOdd, oddChain);
+	insertJacob(main, pending);
+
+	return main;
+}
+
+chainDeq	PmergeMe::createNewLvl(chainDeq& tmp, bool& hasOdd, ChainD& oddChain)
+{
+	chainDeq	newLvl;
+
+	if (hasOdd)
+	{
+		oddChain = tmp.back();
+		tmp.pop_back();
+	}
+	for (size_t i = 0; i < tmp.size(); i += 2)
+	{
+		_compareDeq++;
+		if (tmp[i].winner > tmp[i + 1].winner)
+		{
+			tmp[i].losers.push_back(tmp[i + 1]);
+			newLvl.push_back(tmp[i]);
+		}
+		else 
+		{
+			tmp[i + 1].losers.push_back(tmp[i]);
+			newLvl.push_back(tmp[i +  1]);
+		}
+	}
+	return newLvl;
+}
+
+void	PmergeMe::preJacob(chainDeq& newLvl, chainDeq& main, chainDeq& pending, bool hasOdd, ChainD& oddChain)
+{
+	for (size_t i = 0; i < newLvl.size(); i++)
+	{
+		pending.push_back(newLvl[i].losers.back());
+		pending[i].pos = i;
+		newLvl[i].losers.pop_back();
+		main.push_back(newLvl[i]);
+	}
+	if (hasOdd)
+	{
+		oddChain.pos = main.size();
+		pending.push_back(oddChain);
+	}
+}
+
+void	PmergeMe::insertJacob(chainDeq& main, chainDeq& pending)
+{
+	if (!pending.empty())
+	{
+		main.insert(main.begin(), pending[0]);
+		updatePos(pending, 0);
+	}
+	size_t		lastInsertedPos = 1;
+	ComparatorD	comp(_compareDeq);
+
+	for (size_t i = 0; i < _jacobDeq.size(); i++)
+	{
+		size_t	jacobNo = _jacobDeq[i];
+		size_t	currLimit = std::min<size_t>(jacobNo, pending.size());
+
+		for (size_t j = currLimit; j > lastInsertedPos; j--)
+		{
+			ChainD				target	  = pending[j - 1];
+			chainDeq::iterator	limit	  = main.begin() + pending[j - 1].pos;
+			chainDeq::iterator	insertLoc = std::lower_bound(main.begin(), limit, target.winner, comp);
+			size_t				insertIdx = std::distance(main.begin(), insertLoc);
+			main.insert(insertLoc, target);
+			updatePos(pending,insertIdx);
+		}
+		lastInsertedPos =  currLimit;
+		if (lastInsertedPos ==  pending.size())
+			break ;
+	}
+}
+
+void	PmergeMe::updatePos(chainDeq& pending, size_t insertIdx)
+{
+	for (size_t k = 0; k < pending.size(); k++)
+		if (pending[k].pos >= insertIdx)
+			pending[k].pos++;
+}
+
+void	PmergeMe::printErr(std::string str)
+{
+	std::cerr << "Error: " << str << std::endl;
 }
 
 void PmergeMe::printDeque(const std::deque<int>& deq)
 {
-	for(size_t i = 0; i < deq.size(); ++i)
+	for (size_t i = 0; i < deq.size(); ++i)
 	{
 		std::cout << deq[i];
 		std::cout << " ";
@@ -269,223 +475,103 @@ void PmergeMe::printDeque(const std::deque<int>& deq)
 	std::cout << std::endl;
 }
 
-//not finished yet
-void PmergeMe::processDeque()
-{
-	makeJacobSeq();
-	std::vector<Chain> number;
-	std::vector<Chain> sorted;
-	for (size_t i = 0; i < _nbr.size(); i++)
-	{
-		Chain c;
-		c.winner = _nbr[i];
-		number.push_back(c);
-	}
-	sorted = recurse(number);
-	for (size_t i = 0; i < sorted.size(); i++)
-		_sortedVec.push_back(sorted[i].winner);
-	std::cout << "Before: ";
-	printVector(_nbr);
-	std::cout << std::endl;
-	std::cout << "After: ";
-	printVector(_sortedVec);
-	std::cout << std::endl;
-	std::cout << "No of comparisons: " << _comparison << std::endl;
-}
-
-// std::vector<int> PmergeMe::recurse(std::vector<int> tmp)
+// bool	PmergeMe::chainCompare(const Chain& other, int value)
 // {
-// 	//				FORD JOHNSON MAIN AND PENDING RECURSION
-// 	std::vector<std::pair<int, int> >	pairs;
-// 	int	oddNbr = -1;
-
-// 	if (tmp.size() <= 1)
-// 		return tmp; 
-
-// 	for (int i = 0; i < tmp.size(); i += 2)
-// 	{
-// 		if (i + 1 >= tmp.size())
-// 		{
-// 			//odd number handling. where to store the number? in pending
-// 			oddNbr = tmp[i];
-// 			continue ; //to skip even number handling
-// 		}
-// 		else if (i + 1 < tmp.size())
-// 		{
-// 			int	a;
-// 			int	b;
-// 			if (tmp[i] > tmp[i + 1])
-// 			{
-// 				a = tmp[i];
-// 				b = tmp[i + 1];
-// 			}
-// 			else //so equal would take 2nd and put in main, then 1st in pending
-// 			{
-// 				a = tmp[i + 1];
-// 				b = tmp[i];
-// 			}
-// 			pairs.push_back(std::make_pair(a, b));
-// 		}
-// 	}
-	
-// 	//					PRE JACOBSTHAL
-// 	//create main
-// 	std::vector<int> main;
-	
-// 	for(int i = 0; i < pairs.size(); i++)
-// 		main.push_back(pairs[i].first); 
-		
-// 	main = recurse(main);
-	
-// 	//create pending based on main
-// 	std::vector<int> pending;
-// 	std::vector<int> pairUsed(pairs.size(), false);
-	
-// 	for(int i = 0; i < main.size(); i++)
-// 	{
-// 		for (int j = 0; j < pairs.size(); j++)
-// 		{
-// 			if (main[i] == pairs[j].first && !pairUsed[j])
-// 			{
-// 				pairUsed[j] = true;
-// 				pending.push_back(pairs[j].second);
-// 				break ; 
-// 			}
-// 		}
-// 	}
-// 	if (oddNbr != -1) //bcus if use 1 it will be wrongly detect 0
-// 		pending.push_back(oddNbr);
-
-// 	//				JACOBSTHAL INSERTION
-// 	//push pending to main
-// 	//1st
-// 	if (!pending.empty())
-// 		main.insert(main.begin(), pending[0]);
-
-// 	int lastInsertedPos = 1;
-// 	for (int i = 0; i < _jacobSeq.size(); i++)
-// 	{
-// 		int jacobNo = _jacobSeq[i];
-// 		int currLimit = std::min<int>(jacobNo, pending.size());
-
-// 		for (int j = currLimit; j > lastInsertedPos; j--)
-// 		{
-// 			int value = pending[j - 1];
-// 			auto insertLoc = std::lower_bound(main.begin(), main.end(), value);
-// 			main.insert(insertLoc, value);
-// 		}
-// 		lastInsertedPos = currLimit;
-
-// 		if (lastInsertedPos == pending.size())
-// 			break ;
-// 	}
-// 	return (main);
+// 	return other.winner < value;
 // }
 
 
 
-// std::vector<Chain> PmergeMe::recurse(std::vector<Chain> tmp)
-// {
-// 	//				FORD JOHNSON MAIN AND PENDING RECURSION
-// 	std::vector<Chain>	newLvl;
-// 	bool	hasOdd = false;
-// 	Chain oddChain;
-	
-// 	if (tmp.size() <= 1)
-// 		return tmp; 
 
-// 	std::cout << "1" << std::endl; //debug
+
+
+
+// std::vector<Chain>	PmergeMe::recurse(std::vector<Chain> tmp)
+// {
+// 	//			SEPARATE PENDING AND MAIN
+// 	if (tmp.size() <= 1)
+// 		return tmp;
+
+// 	std::vector<Chain>	newLvl;
+// 	bool				hasOdd = (tmp.size() % 2 != 0);
+// 	Chain				oddChain;
+
+// 	if (hasOdd)
+// 	{
+// 		oddChain = tmp.back();
+// 		tmp.pop_back();
+// 	}
+
 // 	for (size_t i = 0; i < tmp.size(); i += 2)
 // 	{
-// 		if (i + 1 >= tmp.size())// can be outside the loop after loop
+// 		_compareVec++;
+// 		if (tmp[i].winner > tmp[i + 1].winner)
 // 		{
-// 			hasOdd = true;
-// 			oddChain = tmp.back();
+// 			tmp[i].losers.push_back(tmp[i + 1]);
+// 			newLvl.push_back(tmp[i]);
 // 		}
-// 		else if (i + 1 < tmp.size())
+// 		else
 // 		{
-// 			_comparison++;
-// 			if (tmp[i].winner > tmp[i + 1].winner)
-// 			{
-// 				tmp[i].losers.push_back(tmp[i + 1]); //change
-// 				newLvl.push_back(tmp[i]);
-// 			}
-// 			else //so equal would take 2nd and put in main, then 1st in pending
-// 			{
-// 				tmp[i + 1].losers.push_back(tmp[i]); //change
-// 				newLvl.push_back(tmp[i + 1]);
-// 			}
+// 			tmp[i + 1].losers.push_back(tmp[i]);
+// 			newLvl.push_back(tmp[i + 1]);
 // 		}
 // 	}
-// 	std::cout << "2" << std::endl; //debug
-// 	//				RECURSION
+// 	//			RECURSION
 // 	newLvl = recurse(newLvl);
-	
-// 	//create pending based on main
-// 	std::vector<Chain> main;
-// 	std::vector<Chain> pending;
-	
-// 	std::cout << "newLvl size:" << newLvl.size() << std::endl; //debug
-// 	std::cout << "3" << std::endl; //debug
-// 	std::cout << "newlvl size:  " << newLvl.size() << std::endl; //debug
-// 	for(size_t i = 0; i < newLvl.size(); i++)
+
+// 	//			PRE JACOBSTHAL
+// 	std::vector<Chain>	main;
+// 	std::vector<Chain>	pending;
+
+// 	for (size_t i = 0; i < newLvl.size(); i++)
 // 	{
 // 		pending.push_back(newLvl[i].losers.back());
-// 		std::cout << "losers back:  " << newLvl[i].losers.back().winner << "losers size: " << newLvl[i].losers.size() << std::endl;  //debug
-// 		std::cout << "3a" << std::endl; //debug
+// 		pending[i].pos = i; //added
 // 		newLvl[i].losers.pop_back();
-// 		//std::cout << "losers back2:  " << newLvl[i].losers.back().winner << "losers size2: " << newLvl[i].losers.size() << std::endl;  //debug
-// 		std::cout << "3b" << std::endl; //debug
-// 		std::cout << "newlvl size:  " << newLvl.size() << std::endl; //debug
-// 		std::cout << "main size:  " << main.size() << std::endl; //debug
-// 		std::cout << "i:  " << i << std::endl; //debug
 // 		main.push_back(newLvl[i]);
-// 		std::cout << "3c" << std::endl; //debug
 // 	}
-// 	std::cout << "3d" << std::endl; //debug
-// 	if (hasOdd) //bcus if use 1 it will be wrongly detect 0
-// 		pending.push_back(oddChain);
 
-// 	std::cout << "4" << std::endl; //debug
-// 	//				JACOBSTHAL INSERTION
-// 	//push pending to main
-// 	//1st
+// 	if (hasOdd)
+// 	{
+// 		oddChain.pos = main.size();
+// 		pending.push_back(oddChain);
+// 	}
+
 // 	if (!pending.empty())
 // 	{
-// 		std::cout << "4a" << std::endl; //debug
-// 		Chain first;
-// 		first = pending[0];
-// 		main.insert(main.begin(), first);
+// 		main.insert(main.begin(), pending[0]);
+// 		for (size_t k = 0; k < pending.size(); k++)
+// 			pending[k].pos++;
 // 	}
-// 	size_t lastInsertedPos = 1;
-// 	Comparator comp(_comparison);
-// 	std::cout << "5" << std::endl; //debug
-// 	for (size_t i = 0; i < _jacobSeq.size(); i++)
-// 	{
-// 		size_t jacobNo = _jacobSeq[i];
-// 		size_t currLimit = std::min<size_t>(jacobNo, pending.size());
-// 		std::cout << "jacob seq size: " << _jacobSeq[i] << ". pending size: " << pending.size() << ". currlimit: " << currLimit << std::endl; //debug
 
-// 		std::cout << "6" << std::endl; //debug
+// 	//			JACOBSTHAL
+// 	size_t		lastInsertedPos = 1;
+// 	Comparator	comp(_compareVec);
+
+// 	for (size_t i = 0; i < _jacobVec.size(); i++)
+// 	{
+// 		size_t	jacobNo = _jacobVec[i];
+// 		size_t	currLimit = std::min<size_t>(jacobNo, pending.size());
+
 // 		for (size_t j = currLimit; j > lastInsertedPos; j--)
 // 		{
-// 			Chain val = pending[j - 1];
-// 			std::vector<Chain>::iterator insertLoc;
-// 			insertLoc = std::lower_bound(main.begin(), main.end(), val.winner, comp);
+// 			Chain							val = pending[j - 1];
+// 			std::vector<Chain>::iterator	insertLoc;
+
+// 			// insertLoc = std::lower_bound(main.begin(), main.end(), val.winner, comp);
+// 			std::vector<Chain>::iterator limit = main.begin() + pending[j - 1].pos; //added
+// 			insertLoc = std::lower_bound(main.begin(), limit, val.winner, comp);
+// 			size_t insertIdx = std::distance( main.begin(), insertLoc);//added
 // 			main.insert(insertLoc, val);
-// 			std::cout << "6a" << std::endl; //debug
+// 			for(size_t k = 0; k < pending.size(); k++) //added
+// 				if (pending[k].pos >= insertIdx) //added
+// 					pending[k].pos++; //added
 // 		}
-// 		std::cout << "main size 2: " << main.size() << std::endl; //debug
 // 		lastInsertedPos = currLimit;
 
 // 		if (lastInsertedPos == pending.size())
-// 			break ;
+// 			break;
 // 	}
-// 	std::cout << "winner: ";
-// 	for (size_t i = 0; i < main.size(); i++)
-// 	{
-// 		std::cout << " " << main[i].winner;
-// 	}
-// 	std::cout << std::endl;
-// 	return (main);
+
+// 	return main;
 // }

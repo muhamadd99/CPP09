@@ -6,7 +6,7 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/27 15:56:27 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/01 15:26:36 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/08 22:50:20 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ public:
 	BitcoinExchange(const BitcoinExchange& other);
 	BitcoinExchange& operator=(const BitcoinExchange& other);
 	~BitcoinExchange();
-	int 	checkInput();
+	int 	processInput();
 	int		parseRate();
 	int		checkDate(std::string date);
 	int		checkValue(std::string valueStr);

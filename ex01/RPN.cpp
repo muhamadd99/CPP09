@@ -6,7 +6,7 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/01 18:15:12 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/03 18:18:07 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/08 23:17:15 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,12 @@ void	RPN::runInput()
 		}
 		else
 		{
-			std::cerr << "Wrong characters" << std::endl;
+			std::cerr << "Error: Wrong characters" << std::endl;
 			return ;
 		}
 	}
 	if (_nbr.size() != 1)
-		std::cerr << "Error: unfinished number" << std::endl; 
+		std::cerr << "Error: Unfinished number" << std::endl; 
 	else
 		std::cout << _nbr.top() << std::endl;
 }
