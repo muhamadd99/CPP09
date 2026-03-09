@@ -6,7 +6,7 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/02 18:51:50 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/09 12:56:24 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/09 12:58:52 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,6 @@ struct ChainV
 	std::vector<ChainV>	losers;
 	size_t				pos;
 };
-
-	// bool operator<(const ChainV& other) const //do I really need this?
-	// {
-	// 	return winner < other.winner;
-	// }
 
 struct ComparatorV
 {
@@ -48,11 +43,6 @@ struct ChainD
 	std::deque<ChainD>	losers;
 	size_t				pos;
 };
-
-	// bool operator<(const ChainV& other) const //do I really need this?
-	// {
-	// 	return winner < other.winner;
-	// }
 
 struct ComparatorD
 {
@@ -97,7 +87,6 @@ public:
 	void	printErr(std::string str);
 
 	//				VECTOR
-	//std::vector<int>	recurse(std::vector<int> tmp);
 	int			parseVector(int ac, char **av);
 	void		processVec();
 	void		makeJacobVec();
@@ -118,8 +107,6 @@ public:
 	void		insertJacob(chainDeq& main, chainDeq& pending);
 	void		updatePos(chainDeq& pending, size_t insertIdx);
 	void		printDeque(const std::deque<int>& deq);
-	
-	//static bool	chainCompare(const Chain& other, int value);
 };
 
 #endif

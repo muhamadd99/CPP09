@@ -6,11 +6,12 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/01 18:15:12 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/08 23:17:15 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/09 13:00:39 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RPN.hpp"
+#include <iostream>
 
 RPN::RPN(std::string str) : _str(str)
 {}

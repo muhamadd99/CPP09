@@ -6,7 +6,7 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/02 18:51:45 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/09 12:56:52 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/09 12:59:19 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,12 +254,6 @@ void	PmergeMe::insertJacob(chainVec& main, chainVec& pending)
 	}
 }
 
-// for (size_t k = 0; k < pending.size(); k++)
-// 	pending[k].pos++;
-// for (size_t k = 0; k < pending.size(); k++)
-// 	if (pending[k].pos >= insertIdx)
-// 		pending[k].pos++;
-
 void PmergeMe::updatePos(chainVec& pending, size_t insertIdx)
 {
 	for (size_t k = 0; k < pending.size(); k++)
@@ -318,7 +312,6 @@ int PmergeMe::parseDeque(int ac, char **av)
 	return 0;
 }
 
-// not finished yet
 void PmergeMe::processDeq()
 {
 	struct timeval start, end;
@@ -474,104 +467,3 @@ void PmergeMe::printDeque(const std::deque<int>& deq)
 	}
 	std::cout << std::endl;
 }
-
-// bool	PmergeMe::chainCompare(const Chain& other, int value)
-// {
-// 	return other.winner < value;
-// }
-
-
-
-
-
-
-
-// std::vector<Chain>	PmergeMe::recurse(std::vector<Chain> tmp)
-// {
-// 	//			SEPARATE PENDING AND MAIN
-// 	if (tmp.size() <= 1)
-// 		return tmp;
-
-// 	std::vector<Chain>	newLvl;
-// 	bool				hasOdd = (tmp.size() % 2 != 0);
-// 	Chain				oddChain;
-
-// 	if (hasOdd)
-// 	{
-// 		oddChain = tmp.back();
-// 		tmp.pop_back();
-// 	}
-
-// 	for (size_t i = 0; i < tmp.size(); i += 2)
-// 	{
-// 		_compareVec++;
-// 		if (tmp[i].winner > tmp[i + 1].winner)
-// 		{
-// 			tmp[i].losers.push_back(tmp[i + 1]);
-// 			newLvl.push_back(tmp[i]);
-// 		}
-// 		else
-// 		{
-// 			tmp[i + 1].losers.push_back(tmp[i]);
-// 			newLvl.push_back(tmp[i + 1]);
-// 		}
-// 	}
-// 	//			RECURSION
-// 	newLvl = recurse(newLvl);
-
-// 	//			PRE JACOBSTHAL
-// 	std::vector<Chain>	main;
-// 	std::vector<Chain>	pending;
-
-// 	for (size_t i = 0; i < newLvl.size(); i++)
-// 	{
-// 		pending.push_back(newLvl[i].losers.back());
-// 		pending[i].pos = i; //added
-// 		newLvl[i].losers.pop_back();
-// 		main.push_back(newLvl[i]);
-// 	}
-
-// 	if (hasOdd)
-// 	{
-// 		oddChain.pos = main.size();
-// 		pending.push_back(oddChain);
-// 	}
-
-// 	if (!pending.empty())
-// 	{
-// 		main.insert(main.begin(), pending[0]);
-// 		for (size_t k = 0; k < pending.size(); k++)
-// 			pending[k].pos++;
-// 	}
-
-// 	//			JACOBSTHAL
-// 	size_t		lastInsertedPos = 1;
-// 	Comparator	comp(_compareVec);
-
-// 	for (size_t i = 0; i < _jacobVec.size(); i++)
-// 	{
-// 		size_t	jacobNo = _jacobVec[i];
-// 		size_t	currLimit = std::min<size_t>(jacobNo, pending.size());
-
-// 		for (size_t j = currLimit; j > lastInsertedPos; j--)
-// 		{
-// 			Chain							val = pending[j - 1];
-// 			std::vector<Chain>::iterator	insertLoc;
-
-// 			// insertLoc = std::lower_bound(main.begin(), main.end(), val.winner, comp);
-// 			std::vector<Chain>::iterator limit = main.begin() + pending[j - 1].pos; //added
-// 			insertLoc = std::lower_bound(main.begin(), limit, val.winner, comp);
-// 			size_t insertIdx = std::distance( main.begin(), insertLoc);//added
-// 			main.insert(insertLoc, val);
-// 			for(size_t k = 0; k < pending.size(); k++) //added
-// 				if (pending[k].pos >= insertIdx) //added
-// 					pending[k].pos++; //added
-// 		}
-// 		lastInsertedPos = currLimit;
-
-// 		if (lastInsertedPos == pending.size())
-// 			break;
-// 	}
-
-// 	return main;
-// }

@@ -6,7 +6,7 @@
 /*   By: mbani-ya <mbani-ya@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/27 17:20:38 by mbani-ya          #+#    #+#             */
-/*   Updated: 2026/03/08 22:50:14 by mbani-ya         ###   ########.fr       */
+/*   Updated: 2026/03/09 13:03:05 by mbani-ya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 #include <fstream>
 #include <iostream>
 #include <cctype>
-#include <streambuf>
 #include <string>
 #include <cstdlib>
 
@@ -89,7 +88,6 @@ int	BitcoinExchange::processInput()
 		//			CHECK INPUT
 		if (line.empty())
 			continue ;
-		//std::cout << "line: " << line << std::endl;
 		size_t pos = line.find("|");
 		if (pos == std::string::npos)
 		{
@@ -209,7 +207,7 @@ int	BitcoinExchange::strdigit2(std::string str)
 		}
 		else if (std::isdigit(str[i]))
 			hasDigit = true;
-		else /*if (!std::isdigit(str[i]))*/
+		else
 			return 1;
 	}
 	return (!hasDigit);
